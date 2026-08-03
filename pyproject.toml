@@ -1,0 +1,60 @@
+[project]
+name = "decisionos"
+version = "0.1.0"
+description = "Production-grade AI Decision Intelligence Platform"
+readme = "README.md"
+requires-python = ">=3.13"
+
+authors = [
+    { name = "Rahul Jha", email = "rjha72240@gmail.com" }
+]
+
+dependencies = [
+    "pydantic-settings>=2.14.2",
+    "python-dotenv>=1.2.2",
+]
+
+[build-system]
+requires = ["uv_build>=0.8.0,<0.9.0"]
+build-backend = "uv_build"
+
+[tool.uv]
+package = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "F",    # pyflakes
+    "I",    # import sorting
+    "UP",   # pyupgrade
+    "B",    # bugbear
+    "SIM",  # simplification
+    "C4",   # comprehensions
+    "N",    # naming
+]
+
+ignore = [
+    "E501",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+
+[tool.mypy]
+python_version = "3.12"
+
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+strict_optional = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unreachable = true
