@@ -1,11 +1,7 @@
+from datetime import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import Uuid
-from sqlalchemy.orm import Mapped, mapped_column
-
-from datetime import UTC, datetime
-
-from sqlalchemy import DateTime, func
+from sqlalchemy import DateTime, Uuid, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 

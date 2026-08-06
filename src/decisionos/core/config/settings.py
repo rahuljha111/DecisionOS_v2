@@ -24,6 +24,9 @@ class Settings(BaseSettings):
     database_user: str
     database_password: str
 
+    jwt_secret_key: str
+    jwt_access_token_expire_minutes: int = 30
+
     @computed_field
     @property
     def database_url(self) -> str:
@@ -43,6 +46,7 @@ class Settings(BaseSettings):
             f"@{self.database_host}:{self.database_port}"
             f"/{self.database_name}"
         )
+
 
 @lru_cache
 def get_settings() -> Settings:
