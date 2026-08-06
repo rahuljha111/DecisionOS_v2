@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+from pydantic import computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -10,11 +11,38 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    # Application
     app_name: str
     app_env: str
     debug: bool
     log_level: str
 
+    # Database
+    database_host: str
+    database_port: int
+    database_name: str
+    database_user: str
+    database_password: str
+
+    @computed_field
+    @property
+    def database_url(self) -> str:
+        return (
+            "postgresql+asyncpg://"
+            f"{self.database_user}:{self.database_password}"
+            f"@{self.database_host}:{self.database_port}"
+            f"/{self.database_name}"
+        )
+
+    @computed_field
+    @property
+    def database_url_sync(self) -> str:
+        return (
+            "postgresql+psycopg://"
+            f"{self.database_user}:{self.database_password}"
+            f"@{self.database_host}:{self.database_port}"
+            f"/{self.database_name}"
+        )
 
 @lru_cache
 def get_settings() -> Settings:

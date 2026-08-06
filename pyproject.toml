@@ -3,19 +3,22 @@ name = "decisionos"
 version = "0.1.0"
 description = "Production-grade AI Decision Intelligence Platform"
 readme = "README.md"
-<<<<<<< HEAD
+
 requires-python = ">=3.14"
-=======
-requires-python = ">=3.13"
->>>>>>> 1d23afd632ffb8d30bfc9d980ebf3c28cfe6e06e
+
+
 
 authors = [
     { name = "Rahul Jha", email = "rjha72240@gmail.com" }
 ]
 
 dependencies = [
+    "alembic>=1.18.5",
+    "asyncpg>=0.31.0",
+    "psycopg[binary]>=3.3.4",
     "pydantic-settings>=2.14.2",
     "python-dotenv>=1.2.2",
+    "sqlalchemy>=2.0.51",
 ]
 
 [build-system]
@@ -27,11 +30,9 @@ package = true
 
 [tool.ruff]
 line-length = 100
-<<<<<<< HEAD
+
 target-version = "py314"
-=======
-target-version = "py312"
->>>>>>> 1d23afd632ffb8d30bfc9d980ebf3c28cfe6e06e
+
 
 [tool.ruff.lint]
 select = [
@@ -55,7 +56,7 @@ indent-style = "space"
 
 
 [tool.mypy]
-python_version = "3.12"
+python_version = "3.14"
 
 warn_return_any = true
 warn_unused_configs = true
@@ -66,10 +67,9 @@ strict_optional = true
 warn_unused_ignores = true
 warn_redundant_casts = true
 warn_unreachable = true
-<<<<<<< HEAD
+
 
 [tool.uv.build-backend]
 module-root = "src"
 module-name = "decisionos"
-=======
->>>>>>> 1d23afd632ffb8d30bfc9d980ebf3c28cfe6e06e
+
