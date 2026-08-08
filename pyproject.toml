@@ -4,7 +4,7 @@ version = "0.1.0"
 description = "Production-grade AI Decision Intelligence Platform"
 readme = "README.md"
 
-requires-python = ">=3.14"
+requires-python = ">=3.13,<3.14"
 
 
 
@@ -15,10 +15,25 @@ authors = [
 dependencies = [
     "alembic>=1.18.5",
     "asyncpg>=0.31.0",
+    "email-validator>=2.3.0",
+    "fastapi>=0.141.1",
     "psycopg[binary]>=3.3.4",
+    "pwdlib[argon2]>=0.3.0",
     "pydantic-settings>=2.14.2",
+    "pyjwt>=2.13.0",
     "python-dotenv>=1.2.2",
+    "slowapi>=0.1.10",
+
     "sqlalchemy>=2.0.51",
+    "uvicorn>=0.52.1",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "mypy>=2.3.0",
+    "pytest>=9.0.2",
+    "ruff>=0.14.14",
 ]
 
 [build-system]

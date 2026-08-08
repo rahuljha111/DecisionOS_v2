@@ -1,0 +1,13 @@
+model: gemini/gemini-2.5-pro
+weak-model: gemini/gemini-2.5-flash
+
+pretty: true
+dark-mode: true
+
+auto-commits: true
+gitignore: true
+watch-files: true
+
+yes-always: false
+
+map-tokens: 8192
