@@ -3,9 +3,10 @@ from typing import Annotated
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from decisionos.core.middleware.auth import get_current_user
-from decisionos.core.middleware.jwt import create_access_token
-from decisionos.database.session import get_db
+from decisionos.core.database.session import get_db
+from decisionos.core.security.dependencies import get_current_user
+from decisionos.core.security.principals import Principal
+from decisionos.core.security.tokens import create_access_token
 from decisionos.modules.identity.models import User
 from decisionos.modules.identity.schemas import LoginRequest, TokenResponse, UserRead, UserRegister
 from decisionos.modules.identity.service import IdentityService
@@ -15,9 +16,7 @@ auth_router = APIRouter(prefix="/auth", tags=["authentication"])
 
 
 @router.post("/register", response_model=UserRead, status_code=201)
-async def register(
-    data: UserRegister, session: Annotated[AsyncSession, Depends(get_db)]
-) -> UserRead:
+async def register(data: UserRegister, session: Annotated[AsyncSession, Depends(get_db)]) -> User:
     return await IdentityService(session).register(data)
 
 
@@ -30,5 +29,8 @@ async def login(
 
 
 @auth_router.get("/me", response_model=UserRead)
-async def get_me(current_user: Annotated[User, Depends(get_current_user)]) -> User:
-    return current_user
+async def get_me(
+    principal: Annotated[Principal, Depends(get_current_user)],
+    session: Annotated[AsyncSession, Depends(get_db)],
+) -> User:
+    return await IdentityService(session).get_user(principal.id)

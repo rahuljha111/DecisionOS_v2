@@ -3,7 +3,7 @@ from uuid import uuid4
 
 from fastapi.testclient import TestClient
 
-from decisionos.core.middleware.auth import get_current_user
+from decisionos.core.security.dependencies import get_current_user
 from decisionos.main import app
 from decisionos.modules.identity.models import User
 

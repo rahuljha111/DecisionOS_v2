@@ -1,4 +1,4 @@
-from decisionos.database.base import Base
+from decisionos.core.database.base import Base
 from decisionos.modules.identity.models import User
 
 

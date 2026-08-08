@@ -4,7 +4,7 @@ from uuid import uuid4
 
 import pytest
 
-from decisionos.database.repository import BaseRepository
+from decisionos.core.database.repository import BaseRepository
 from decisionos.modules.identity.models import User
 
 

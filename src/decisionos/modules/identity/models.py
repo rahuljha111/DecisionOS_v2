@@ -5,8 +5,8 @@ from datetime import datetime
 from sqlalchemy import Boolean, DateTime, String, text
 from sqlalchemy.orm import Mapped, mapped_column
 
-from decisionos.database.base import Base
-from decisionos.database.mixins import TimestampMixin, UUIDMixin
+from decisionos.core.database.base import Base
+from decisionos.core.database.mixins import TimestampMixin, UUIDMixin
 
 
 class User(UUIDMixin, TimestampMixin, Base):
