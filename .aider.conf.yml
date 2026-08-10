@@ -10,4 +10,10 @@ watch-files: true
 
 yes-always: false
 
-map-tokens: 8192
+map-tokens: 2048
+
+alias:
+  - nvidia:nvidia_nim/nvidia/nemotron-3-super-120b-a12b
+  - ollama:ollama_chat/qwen2.5-coder:7b
+  - groq:groq/llama-3.3-70b-versatile
+  - gemini:gemini/gemini-2.5-pro
