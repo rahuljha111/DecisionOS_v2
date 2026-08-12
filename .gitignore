@@ -29,3 +29,5 @@ htmlcov/
 
 alembic.ini
 .aider*
+
+.aider.conf.yml
