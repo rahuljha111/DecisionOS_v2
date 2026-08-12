@@ -16,6 +16,14 @@ from decisionos.core.rate_limit import register_rate_limiter
 from decisionos.core.security.principals import Principal, register_principal_loader
 from decisionos.modules.identity.repository import UserRepository
 
+# Import models to ensure they are registered with Base.metadata
+from decisionos.modules.identity.models import User as _User  # noqa: F401
+from decisionos.modules.workspaces.models import Workspace as _Workspace  # noqa: F401
+from decisionos.modules.decisions.models import Decision as _Decision  # noqa: F401
+
+from decisionos.modules.workspaces.router import router as workspace_router
+from decisionos.modules.decisions.router import router as decision_router
+
 
 async def load_identity_principal(user_id: UUID) -> Principal | None:
     async with SessionLocal() as session:
@@ -41,6 +49,8 @@ def create_app() -> FastAPI:
     configure_security_middleware(app, allowed_origins=settings.cors_origins)
 
     app.include_router(api_router)
+    app.include_router(workspace_router, prefix="/workspaces", tags=["workspaces"])
+    app.include_router(decision_router, prefix="/decisions", tags=["decisions"])
     return app
 
 

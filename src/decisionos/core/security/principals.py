@@ -1,6 +1,7 @@
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from uuid import UUID
+from fastapi import Request, HTTPException, status
 
 
 @dataclass(frozen=True, slots=True)
@@ -23,3 +24,17 @@ async def load_principal(user_id: UUID) -> Principal | None:
     if _principal_loader is None:
         raise RuntimeError("No security principal loader is registered")
     return await _principal_loader(user_id)
+
+
+async def get_current_user(request: Request) -> UUID:
+    """
+    FastAPI dependency to get the current authenticated user ID.
+    Expects an authentication middleware to have set request.state.user_id.
+    """
+    user_id = getattr(request.state, "user_id", None)
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+        )
+    return user_id

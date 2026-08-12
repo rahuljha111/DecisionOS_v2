@@ -1,12 +1,17 @@
 """SQLAlchemy models owned by the Identity module."""
 
+from __future__ import annotations
 from datetime import datetime
+from typing import List, TYPE_CHECKING
 
 from sqlalchemy import Boolean, DateTime, String, text
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from decisionos.core.database.base import Base
 from decisionos.core.database.mixins import TimestampMixin, UUIDMixin
+
+if TYPE_CHECKING:
+    from decisionos.modules.workspaces.models import Workspace
 
 
 class User(UUIDMixin, TimestampMixin, Base):
@@ -27,3 +32,7 @@ class User(UUIDMixin, TimestampMixin, Base):
         Boolean, nullable=False, server_default=text("false")
     )
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    workspaces: Mapped[List["Workspace"]] = relationship(
+        "Workspace", backref="owner", cascade="all, delete-orphan"
+    )
