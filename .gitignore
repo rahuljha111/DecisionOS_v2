@@ -26,8 +26,8 @@ Thumbs.db
 .coverage
 htmlcov/
 
+.aider.conf.yaml
+.aider.instruction.md
 
 alembic.ini
-.aider*
 
-.aider.conf.yml
