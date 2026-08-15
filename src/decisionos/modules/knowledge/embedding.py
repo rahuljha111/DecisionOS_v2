@@ -74,3 +74,42 @@ class ProviderError(AppError):
     def __init__(self, message: str, provider: str | None = None) -> None:
         super().__init__(f"Embedding provider error: {message}")
         self.provider = provider
+
+
+def get_embedding_provider() -> EmbeddingProvider:
+    """Composition boundary for embedding providers.
+
+    Returns the configured :class:`EmbeddingProvider` based on application
+    settings. The concrete implementation (and any provider-selection logic)
+    stays behind this boundary so callers depend only on the abstract
+    interface, never on a specific provider class.
+
+    Dependency flow:
+
+        Router / task / service
+              ↓
+        get_embedding_provider()  -> EmbeddingProvider
+              ↓
+        concrete provider (e.g. HuggingFaceEmbeddingProvider)
+    """
+    from decisionos.core.config.settings import get_settings
+
+    settings = get_settings()
+    provider_name = settings.embedding_provider
+
+    if provider_name == "huggingface":
+        # Imported lazily so the heavy sentence-transformers dependency is only
+        # loaded when the HF provider is actually selected.
+        from decisionos.modules.knowledge.providers.hf_embedding import (
+            HuggingFaceEmbeddingProvider,
+        )
+
+        return HuggingFaceEmbeddingProvider(
+            model_name=settings.embedding_model_name,
+            dimensions=settings.embedding_dimensions,
+        )
+
+    raise ProviderError(
+        f"Unknown embedding provider: {provider_name!r}",
+        provider=provider_name,
+    )

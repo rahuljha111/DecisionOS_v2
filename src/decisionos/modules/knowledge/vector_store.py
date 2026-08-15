@@ -140,41 +140,75 @@ class QdrantVectorStore:
         vector: List[float],
         workspace_id: str,
         limit: int = 10,
+        query_filter: Optional[Filter] = None,
+        with_payload: bool = True,
         filter_conditions: Optional[Dict[str, Any]] = None,
     ) -> List[Dict[str, Any]]:
         """Search for similar vectors within a workspace.
 
         Args:
             vector: The query embedding vector
-            workspace_id: The workspace to search within (isolation)
+            workspace_id: The workspace to search within (isolation). This is
+                always merged into the final filter as a mandatory `must`
+                condition regardless of what ``query_filter`` already contains,
+                so workspace isolation can never be bypassed by a malformed
+                caller-supplied filter.
             limit: Maximum number of results to return
-            filter_conditions: Additional filter conditions
+            query_filter: Optional pre-built Qdrant :class:`Filter` expressing
+                the caller's document/source/metadata conditions (workspace_id
+                is added here if missing). Multiple values for a single field
+                must be expressed with :class:`MatchAny` (IN semantics), not as
+                multiple ``must`` conditions, to avoid the
+                ``A AND B`` (impossible) semantic.
+            with_payload: Whether to return point payloads.
+            filter_conditions: Legacy ``{key: value}`` dict form, kept for
+                backward compatibility. When provided, it is converted to
+                ``must`` FieldConditions in addition to the workspace filter.
+                ``query_filter`` takes precedence when both are supplied.
 
         Returns:
-            List of search results with payload and score
+            List of search results with payload and score. Note that score
+            threshold / top-k enforcement is the caller's responsibility (the
+            Qdrant search API cannot express the threshold portably across
+            versions); see :class:`RagService`.
         """
         await self.ensure_collection()
 
-        # Always filter by workspace_id for isolation
-        must_filter = [
-            FieldCondition(key="workspace_id", match={"value": workspace_id})
-        ]
+        # Workspace isolation is mandatory and is applied here (the boundary
+        # owner) so it cannot be omitted by an upstream caller. If the caller
+        # supplied a Filter that already contains a workspace_id condition we
+        # still re-assert it via a separate must clause tuple to be safe.
+        workspace_condition = FieldCondition(
+            key="workspace_id", match={"value": workspace_id}
+        )
 
-        if filter_conditions:
-            # Merge additional filters
+        if query_filter is not None:
+            # Merge the caller filter with the mandatory workspace condition.
+            caller_must = list(query_filter.must or [])
+            query_filter = Filter(
+                must=[workspace_condition, *caller_must],
+                should=list(query_filter.should or []),
+                must_not=list(query_filter.must_not or []),
+                min_should=query_filter.min_should,
+            )
+        elif filter_conditions:
+            must_filter = [workspace_condition]
             for key, value in filter_conditions.items():
                 must_filter.append(
                     FieldCondition(key=key, match={"value": value}
                     if isinstance(value, str) else {"value": value})
                 )
+            query_filter = Filter(must=must_filter)
+        else:
+            query_filter = Filter(must=[workspace_condition])
 
         try:
             search_result = await self.client.search(
                 collection_name=self.collection_name,
                 query_vector=vector,
                 limit=limit,
-                query_filter=Filter(must=must_filter) if must_filter else None,
-                with_payload=True,
+                query_filter=query_filter,
+                with_payload=with_payload,
                 with_vectors=False,
             )
 
