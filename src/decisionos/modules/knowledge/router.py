@@ -1,17 +1,17 @@
 from uuid import UUID
+from typing import Annotated
 
 from fastapi import APIRouter, Depends, status, UploadFile, File
-from typing import Annotated
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from decisionos.core.database.session import get_db
-from decisionos.core.security.principals import get_current_user
+from decisionos.core.security.dependencies import get_current_user
+from decisionos.core.security.principals import Principal
 from decisionos.modules.knowledge.service import KnowledgeService
 from decisionos.modules.knowledge.schemas import (
     KnowledgeDocumentCreate,
     KnowledgeDocumentRead,
     KnowledgeDocumentUpdate,
-    KnowledgeChunkCreate,
     KnowledgeChunkRead,
 )
 
@@ -27,10 +27,12 @@ async def create_document(
     workspace_id: UUID,
     data: KnowledgeDocumentCreate,
     session: Annotated[AsyncSession, Depends(get_db)],
-    user: Annotated[UUID, Depends(get_current_user)],
+    user: Annotated[Principal, Depends(get_current_user)],
 ):
     return await KnowledgeService(session).create_document(
-        workspace_id, data, user
+        workspace_id,
+        data,
+        user.id,
     )
 
 
@@ -43,7 +45,7 @@ async def upload_document(
     workspace_id: UUID,
     file: Annotated[UploadFile, File(...)],
     session: Annotated[AsyncSession, Depends(get_db)],
-    user: Annotated[UUID, Depends(get_current_user)],
+    user: Annotated[Principal, Depends(get_current_user)],
 ):
     import magic
 
@@ -57,17 +59,25 @@ async def upload_document(
     )
 
     return await KnowledgeService(session).create_document(
-        workspace_id, document_create, user
+        workspace_id,
+        document_create,
+        user.id,
     )
 
 
-@router.get("/workspaces/{workspace_id}/documents", response_model=list[KnowledgeDocumentRead])
+@router.get(
+    "/workspaces/{workspace_id}/documents",
+    response_model=list[KnowledgeDocumentRead],
+)
 async def list_documents(
     workspace_id: UUID,
     session: Annotated[AsyncSession, Depends(get_db)],
-    user: Annotated[UUID, Depends(get_current_user)],
+    user: Annotated[Principal, Depends(get_current_user)],
 ):
-    return await KnowledgeService(session).list_documents(workspace_id, user)
+    return await KnowledgeService(session).list_documents(
+        workspace_id,
+        user.id,
+    )
 
 
 @router.get(
@@ -78,9 +88,12 @@ async def get_document(
     workspace_id: UUID,
     document_id: UUID,
     session: Annotated[AsyncSession, Depends(get_db)],
-    user: Annotated[UUID, Depends(get_current_user)],
+    user: Annotated[Principal, Depends(get_current_user)],
 ):
-    return await KnowledgeService(session).get_document(document_id, user)
+    return await KnowledgeService(session).get_document(
+        document_id,
+        user.id,
+    )
 
 
 @router.patch(
@@ -92,10 +105,12 @@ async def update_document(
     document_id: UUID,
     data: KnowledgeDocumentUpdate,
     session: Annotated[AsyncSession, Depends(get_db)],
-    user: Annotated[UUID, Depends(get_current_user)],
+    user: Annotated[Principal, Depends(get_current_user)],
 ):
     return await KnowledgeService(session).update_document(
-        document_id, data, user
+        document_id,
+        data,
+        user.id,
     )
 
 
@@ -107,9 +122,12 @@ async def delete_document(
     workspace_id: UUID,
     document_id: UUID,
     session: Annotated[AsyncSession, Depends(get_db)],
-    user: Annotated[UUID, Depends(get_current_user)],
+    user: Annotated[Principal, Depends(get_current_user)],
 ):
-    await KnowledgeService(session).delete_document(document_id, user)
+    await KnowledgeService(session).delete_document(
+        document_id,
+        user.id,
+    )
 
 
 @router.get(
@@ -120,6 +138,9 @@ async def list_chunks(
     workspace_id: UUID,
     document_id: UUID,
     session: Annotated[AsyncSession, Depends(get_db)],
-    user: Annotated[UUID, Depends(get_current_user)],
+    user: Annotated[Principal, Depends(get_current_user)],
 ):
-    return await KnowledgeService(session).list_chunks(document_id, user)
+    return await KnowledgeService(session).list_chunks(
+        document_id,
+        user.id,
+    )

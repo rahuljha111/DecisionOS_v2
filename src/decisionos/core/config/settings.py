@@ -67,7 +67,7 @@ class Settings(BaseSettings):
 
     # ---- Web -------------------------------------------------------------
     # JSON array, e.g. ["http://localhost:5173"]; empty disables CORS origins.
-    cors_origins: list[str] = []
+    cors_origins: list[str] = ["http://localhost:5173"]
     trusted_hosts: list[str] = []
 
     # ---- Rate limiting (SlowAPI) -----------------------------------------

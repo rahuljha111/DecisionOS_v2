@@ -61,3 +61,10 @@ async def _unhandled_exception_handler(request: Request, exc: Exception) -> JSON
 def register_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(AppError, _app_error_handler)
     app.add_exception_handler(Exception, _unhandled_exception_handler)
+
+class ServiceError(AppError):
+    """Raised when a service operation fails."""
+
+    def __init__(self, message: str, provider: str | None = None) -> None:
+        super().__init__(f"Service error: {message}")
+        self.provider = provider
