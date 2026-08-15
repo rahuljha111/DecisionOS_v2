@@ -1,0 +1,1 @@
+"""TaskIQ configuration for DecisionOS knowledge ingestion pipeline."""

@@ -49,6 +49,22 @@ class Settings(BaseSettings):
     jwt_secret_key: str
     jwt_access_token_expire_minutes: int = 30
 
+    # ---- Embeddings ------------------------------------------------------
+    embedding_provider: str = "huggingface"
+    embedding_model_name: str = "sentence-transformers/all-MiniLM-L6-v2"
+    embedding_dimensions: int = 384
+    embedding_api_base: str | None = None
+    embedding_api_key: str | None = None
+
+    # ---- OCR -------------------------------------------------------------
+    ocr_provider: str = "tesseract"
+    ocr_tesseract_cmd: str | None = None
+    ocr_languages: str = "eng"
+    ocr_paddlepaddle_lang: str = "ch"
+    ocr_baidu_app_id: str | None = None
+    ocr_baidu_api_key: str | None = None
+    ocr_baidu_secret_key: str | None = None
+
     # ---- Web -------------------------------------------------------------
     # JSON array, e.g. ["http://localhost:5173"]; empty disables CORS origins.
     cors_origins: list[str] = []
@@ -58,6 +74,11 @@ class Settings(BaseSettings):
     rate_limit_enabled: bool = False
     # Expressed in the ``limits`` grammar, e.g. "100/minute".
     rate_limit: str = "100/minute"
+
+    # ---- Qdrant ----------------------------------------------------------
+    qdrant_host: str = "localhost"
+    qdrant_port: int = 6333
+    qdrant_collection: str = "decisionos_knowledge"
 
     @model_validator(mode="after")
     def _validate_secrets(self) -> Settings:
